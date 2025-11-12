@@ -1,0 +1,5 @@
+<resources>
+    <style name="NumberPickerTheme">
+        <item name="android:textColorPrimary">#FFFFFF</item>
+    </style>
+</resources>
