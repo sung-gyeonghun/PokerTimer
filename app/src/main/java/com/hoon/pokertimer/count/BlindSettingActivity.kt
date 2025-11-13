@@ -5,10 +5,13 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -173,7 +176,7 @@ class BlindSettingActivity : AppCompatActivity() {
 
             val bigInput = EditText(this).apply {
                 setText(dao.getBlind(i - 1).big.toString())
-                setTextColor(Color.RED)
+                setTextColor(Color.parseColor("#FF9233"))
                 backgroundTintList =
                     ContextCompat.getColorStateList(context, android.R.color.darker_gray)
                 gravity = Gravity.CENTER

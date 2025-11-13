@@ -14,6 +14,15 @@ import com.hoon.pokertimer.count.SettingActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+
+//        // 스플래시 적용
+//        val splash = SplashScreen.installSplashScreen(this)
+//
+//        // 2초 유지 후 자동 종료
+//        splash.setKeepOnScreenCondition {
+//            Thread.sleep(2000)
+//            false
+//        }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
