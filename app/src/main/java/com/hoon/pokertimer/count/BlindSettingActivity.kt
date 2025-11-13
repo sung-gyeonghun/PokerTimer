@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -16,14 +17,39 @@ import com.hoon.pokertimer.dao.BlindDao
 import com.hoon.pokertimer.dto.Blind
 
 class BlindSettingActivity : AppCompatActivity() {
-    private val blindList = MutableList(20) { Blind(0, 0, 0) }
     private val dao = BlindDao
+    private lateinit var container: LinearLayout
+    private val smallInputs = mutableListOf<EditText>()
+    private val anteInputs = mutableListOf<EditText>()
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        val smalls = IntArray(20)
+        val antes = IntArray(20)
+        for (i in 0 until container.childCount) {
+            val view = container.getChildAt(i)
+            if (view is LinearLayout && view.tag == "level_row") {
+                val smallInput = view.getChildAt(1) as EditText
+                val anteInput = view.getChildAt(3) as EditText
+                val smallindex = smallInputs.indexOf(smallInput)
+                val anteIndex = anteInputs.indexOf(anteInput)
+                if (smallindex in 0 until 20)
+                    smalls[smallindex] = smallInput.text.toString().toIntOrNull() ?: 0
+                if (anteIndex in 0 until 20)
+                    antes[anteIndex] = anteInput.text.toString().toIntOrNull() ?: 0
+            }
+        }
+        outState.putIntArray("smalls", smalls)
+        outState.putIntArray("antes", antes)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_blind_setting)
 
-        val container = findViewById<LinearLayout>(R.id.container)
+        container = findViewById<LinearLayout>(R.id.container)
 
         // 전체화면 immersive 설정
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -70,28 +96,6 @@ class BlindSettingActivity : AppCompatActivity() {
                 Toast.makeText(context, "기본값으로 초기화되었습니다.", Toast.LENGTH_SHORT).show()
                 dao.initBlinds()
                 finish()
-//                val defaults = listOf(
-//                    100, 300, 500, 1000, 1500, 2000, 2500,
-//                    3000, 4000, 5000, 6000, 8000, 10000,
-//                    12000, 15000, 20000, 25000, 30000, 40000, 50000
-//                )
-//
-//                // 모든 행의 값 업데이트
-//                for (i in 1..20) {
-//                    val row = container.getChildAt(i + 2) // (topBar, header 포함)
-//                    if (row is LinearLayout && row.childCount == 4) {
-//                        val smallInput = row.getChildAt(1) as EditText
-//                        val bigInput = row.getChildAt(2) as EditText
-//                        val anteInput = row.getChildAt(3) as EditText
-//
-//                        val small = defaults[i - 1]
-//                        val big = small * 2
-//                        smallInput.setText(small.toString())
-//                        bigInput.setText(big.toString())
-//                        anteInput.setText(big.toString())
-//                        blindList[i - 1] = Blind(small, big, big)
-//                    }
-//                }
             }
         }
 
@@ -163,13 +167,17 @@ class BlindSettingActivity : AppCompatActivity() {
                     LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             }
 
+// 🔥 여기 추가해야 함!!
+            smallInputs.add(smallInput)
+
+
             val bigInput = EditText(this).apply {
                 setText(dao.getBlind(i - 1).big.toString())
-                isEnabled = false
                 setTextColor(Color.RED)
                 backgroundTintList =
                     ContextCompat.getColorStateList(context, android.R.color.darker_gray)
                 gravity = Gravity.CENTER
+                inputType = android.text.InputType.TYPE_CLASS_NUMBER
                 layoutParams =
                     LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             }
@@ -180,9 +188,12 @@ class BlindSettingActivity : AppCompatActivity() {
                 backgroundTintList =
                     ContextCompat.getColorStateList(context, android.R.color.darker_gray)
                 gravity = Gravity.CENTER
+                inputType = android.text.InputType.TYPE_CLASS_NUMBER
                 layoutParams =
                     LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             }
+
+            anteInputs.add(anteInput)
 
             // small 값 변경 → big/ante 자동 계산
             smallInput.addTextChangedListener(object : TextWatcher {
@@ -190,7 +201,7 @@ class BlindSettingActivity : AppCompatActivity() {
                     val small = s?.toString()?.toIntOrNull() ?: 0
                     val big = small * 2
                     bigInput.setText(big.toString())
-                    anteInput.setText(big.toString())
+//                    anteInput.setText(big.toString())
                 }
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -202,6 +213,23 @@ class BlindSettingActivity : AppCompatActivity() {
             row.addView(bigInput)
             row.addView(anteInput)
             container.addView(row)
+        }
+
+        val restoredSmall = savedInstanceState?.getIntArray("smalls")
+        val restoredAnte = savedInstanceState?.getIntArray("antes")
+        if (restoredSmall != null) {
+            for (i in restoredSmall.indices) {
+                if (restoredSmall[i] != 0) {
+                    smallInputs[i].setText(restoredSmall[i].toString())
+                }
+            }
+        }
+
+        if (restoredAnte != null) {
+            for (i in restoredAnte.indices) {
+                // ante는 0도 valid 값일 수 있으니 무조건 세팅
+                anteInputs[i].setText(restoredAnte[i].toString())
+            }
         }
 
         // 저장 버튼
@@ -262,4 +290,7 @@ class BlindSettingActivity : AppCompatActivity() {
 
         container.addView(saveButton)
     }
+
+
+
 }

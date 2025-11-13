@@ -3,14 +3,19 @@ package com.hoon.pokertimer.count
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.hoon.pokertimer.R
+import com.hoon.pokertimer.dao.BlindDao
 import com.hoon.pokertimer.databinding.ActivitySettingBinding
 
+private const val TAG = "SettingActivity_싸피"
 class SettingActivity : AppCompatActivity() {
-
+    var dao = BlindDao
     companion object {
         const val EXTRA_TOTAL_SECONDS = "extra_total_seconds"
     }
@@ -62,6 +67,16 @@ class SettingActivity : AppCompatActivity() {
             val intent = Intent(this, BlindSettingActivity::class.java)
             startActivity(intent)
 
+        }
+
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        for(i in 0 .. 19){
+            Log.d(TAG, "small $i : ${dao.getBlind(i).small}, big $i : ${dao.getBlind(i).big}, ante $i : ${dao.getBlind(i).ante} ")
         }
     }
 }
