@@ -10,17 +10,20 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:screenOrientation="sensorLandscape"
         android:theme="@style/Theme.PokerTimer"
         android:name=".PokerTimerApplication">
-        <activity android:name=".count.CountActivity" />
-        <activity android:name=".count.SettingActivity" />
-        <activity android:name=".count.BlindSettingActivity" />
+        <activity android:name=".count.CountActivity"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".count.SettingActivity"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".count.BlindSettingActivity"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.PokerTimer">
+            android:theme="@style/Theme.PokerTimer"
+            android:screenOrientation="sensorLandscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
